@@ -67,7 +67,6 @@ class GamesController < ApplicationController
 
   private
     def find_mafiosi_target
-
       if @mafiosi[0].prev_action_target_id
         @mafiosi_target = Player.find(@mafiosi[0].prev_action_target_id)
         @mafiosi.each do |mafioso|

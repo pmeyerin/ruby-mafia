@@ -1,5 +1,4 @@
 class PlayersController < ApplicationController
-
   def new
     @game_id = params[:game_id]
     @user_id = Current.user.id

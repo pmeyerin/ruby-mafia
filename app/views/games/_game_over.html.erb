@@ -1,0 +1,14 @@
+<h1>Game over!</h1>
+
+<% if @mafiosi.count == 0 %>
+  <h2>The villagers won!</h2>
+<% else %>
+  <h2>The mafiosi won!</h2>
+<% end %>
+
+<p>summary:</p>
+<ul>
+  <% game.player.each do |player| %>
+    <li><%= player.display_name %> (<%= Player::ROLES[player.role] %>) <%= player.alive ? "survived" : "did not survive" %></li>
+  <% end %>
+</ul>

@@ -1,0 +1,15 @@
+<h1>Add player to game</h1>
+
+<%= form_with model: @player do |form| %>
+  <%= form.hidden_field :game_id, value: params[:game_id] %>
+  <%= form.hidden_field :user_id, value: @user_id %>
+  <%= form.hidden_field :alive, value: true %>
+  <div>
+    <%= form.label :display_name %>
+    <%= form.text_field :display_name, :autofocus => true %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

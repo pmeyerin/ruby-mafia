@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  minPlayers: 1
+  maxPlayers: 1
+  useInformant: false
+  useLawyer: false
+  useVigilante: false
+
+two:
+  name: MyString
+  minPlayers: 1
+  maxPlayers: 1
+  useInformant: false
+  useLawyer: false
+  useVigilante: false

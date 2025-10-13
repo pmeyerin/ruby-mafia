@@ -1,0 +1,83 @@
+<h3>DAY TIME</h3>
+
+<%= render "night_summary", game: @game, player: @player %>
+
+<p>You are a <%= Player::ROLES[@player.role] %></p>
+
+<% if @player.role == PLAYER_ROLE[:VILLAGER] %>
+  <p>Your goal as a villager is to eliminate all of the mafiosi.</p>
+
+  <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
+<% end %>
+
+<% if @player.role == PLAYER_ROLE[:MAFIOSO] %>
+  <p>Your goal as a mafioso is to eliminate all of the villagers. You will win if the number of villagers equals the number of mafiosi.</p>
+
+  <p>During the night you and the other mafiosi will choose a villager to attack.</p>
+
+  <p>Because you are undercover you have a vote in whom to eliminate as though you were a normal villager. You must convince the others you are not a mafioso.</p>
+
+  <p>This game's mafiosi are:</p>
+  <ul>
+    <% @mafiosi.each do |mafioso| %>
+      <li><%= mafioso.display_name %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<% if @player.role == PLAYER_ROLE[:DETECTIVE] %>
+  <p>Your goal as a detective is to eliminate all of the mafiosi.</p>
+
+  <p>During the night you have may choose a villager to visit. If that villager is attacked you will learn the identity of the Mafiosi.</p>
+
+  <% if @detective_saw %>
+    <p>During the night you witnessed the attacked on <%= @mafiosi_target.display_name %>! You identified the mafiosi as:</p>
+    <ul>
+      <% @mafiosi.each do |mafioso| %>
+        <li><%= mafioso.display_name %></li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>
+
+  <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
+
+<% if @player.role == PLAYER_ROLE[:DOCTOR] %>
+  <p>Your goal as a doctor is to eliminate all of the mafiosi.</p>
+
+  <p>During the night you have may choose a villager to visit. If that villager is attacked you will prevent that villager from dying.</p>
+
+  <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
+<% end %>
+
+<p>When someone has more than 50 percent of the votes that person will be eliminated and the game will transition to night time</p>
+
+<p>Choose someone to vote to eliminate:</p>
+
+<% if @voting_for_me.count > 0 %>
+  <p>The following players have voted to eliminate you:</p>
+  <ul>
+    <% @voting_for_me.each do |voter| %>
+        <li><%= voter.display_name %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<ul>
+  <% @game.player.filter { |player| player.alive == true }.each do |villager| %>
+    <% if villager.id != @player.id %>
+      <li>
+        <% if villager.id != @player.action_target_id %>
+          <%= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
+        <% else %>
+          <%= villager.display_name %> (Your current target)
+        <% end %>
+        <% game.player.each do |voter| %>
+          <% if villager.id == voter.action_target_id and voter.id != @player.id %>
+            (target of <%= voter.display_name %>)
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
+  <% end %>
+</ul>

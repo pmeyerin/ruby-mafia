@@ -1,0 +1,21 @@
+<h3>this game is waiting to start</h3>
+
+Ready players
+<%= @game.player.count %> out of min <%= @game.min_players %> and expected max of <%= @game.max_players %>
+
+<ul>
+  <% @game.player.each do |player| %>
+    <li><%= player.display_name %></li>
+  <% end %>
+</ul>
+
+<% if @game.use_detective %>
+  This game will include a detective <br/>
+<% end %>
+<% if @game.use_doctor %>
+  This game will include a doctor <br/>
+<% end %>
+
+<% if @game.player.count >= @game.min_players %>
+  <%= link_to "Start game", game_path(@game, :game_phase => 1), data: {turbo_method: :patch} %>
+<% end %>

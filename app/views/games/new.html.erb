@@ -1,0 +1,33 @@
+<h1>Create new game of Mafia</h1>
+
+<%= form_with model: @game do |form| %>
+  <%= form.hidden_field :game_phase, value: "2" %>
+  <div>
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+  <div>
+    <%= form.label :min_players %>
+    <%= form.number_field :min_players, value: 5 %>
+  </div>
+  <div>
+    <%= form.label :max_players %>
+    <%= form.number_field :max_players, value: 20 %>
+  </div>
+  <div>
+    <%= form.label :mafioso_ratio %>
+    <%= form.number_field :mafioso_ratio, step: 0.1, value: 3 %>
+  </div>
+  <div>
+    <%= form.label :use_detective %>
+    <%= form.check_box :use_detective, checked: true %>
+  </div>
+  <div>
+    <%= form.label :use_doctor %>
+    <%= form.check_box :use_doctor, checked: true %>
+  </div>
+
+  <div>
+    <%= form.submit %>
+  </div>
+<% end %>

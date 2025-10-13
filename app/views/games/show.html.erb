@@ -1,0 +1,11 @@
+<% if @game_over %>
+  <%= render "game_over", game: @game %>
+<% elsif @player and !@player.alive%>
+  <%= render "dead_player" %>
+<% else %>
+  <%= render "pending_start", game: @game if (@game.game_phase == GAME_PHASE[:PENDING_START]) %>
+
+  <%= render "night", game: @game, player: @player if (@game.game_phase == GAME_PHASE[:NIGHT]) %>
+
+  <%= render "day", game: @game, player: @player if (@game.game_phase == GAME_PHASE[:DAY]) %>
+<% end %>

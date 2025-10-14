@@ -20,7 +20,7 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment
-ENV RAILS_ENV="production" \
+ENV RAILS_ENV="development" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development"
@@ -53,9 +53,6 @@ RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 # Final stage for app image
 FROM base
-
-#ENV SECRET_KEY_BASE="69db6ddcefead4c1bb0d0b51f6efb0ddc1fd762eaceb2c7b4cd81be9067ebcc3d0be36a5e7ae4325a09a1cfa6caebdf5cdc1bebe04bfe829d87cf7d8b8873d31"
-ENV RAILS_ENV="development"
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"

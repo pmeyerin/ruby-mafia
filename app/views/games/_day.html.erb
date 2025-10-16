@@ -40,7 +40,7 @@
   <% end %>
 <% end %>
 
-  <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
+<p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
 
 <% if @player.role == PLAYER_ROLE[:DOCTOR] %>
   <p>Your goal as a doctor is to eliminate all of the mafiosi.</p>
@@ -58,7 +58,7 @@
   <p>The following players have voted to eliminate you:</p>
   <ul>
     <% @voting_for_me.each do |voter| %>
-        <li><%= voter.display_name %></li>
+      <li><%= voter.display_name %></li>
     <% end %>
   </ul>
 <% end %>

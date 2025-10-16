@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resource :session
   get "players/index"
   resource :sessions
   resources :passwords, param: :token

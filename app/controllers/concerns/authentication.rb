@@ -31,7 +31,7 @@ module Authentication
 
     def request_authentication
       session[:return_to_after_authenticating] = request.url
-      redirect_to new_sessions_path
+      redirect_to new_session_path
     end
 
     def after_authentication_url
@@ -39,7 +39,7 @@ module Authentication
     end
 
     def start_new_session_for(user)
-      user.session.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
+      user.sessions.create!(user_agent: request.user_agent, ip_address: request.remote_ip).tap do |session|
         Current.session = session
         cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
       end

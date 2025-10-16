@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_05_015345) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_16_154340) do
   create_table "games", force: :cascade do |t|
     t.string "name"
     t.integer "min_players"
@@ -53,6 +53,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_05_015345) do
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
   add_foreign_key "players", "players", column: "action_target_id"

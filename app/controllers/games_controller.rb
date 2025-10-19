@@ -1,7 +1,6 @@
 class GamesController < ApplicationController
   def index
     @logged_in_user = Current.user.id
-    # @avail_games = Game.where(game_phase: 2).where.not(id: Player.where(user_id: @logged_in_user).select("game_id"))
     @avail_games = Game.where.not(id: Game.joins(:round).select("games.id"))
                        .where.not(id: Player.where(user_id: @logged_in_user).select("game_id"))
     @my_games = Game.where(id: Player.where(user_id: @logged_in_user).select("game_id"))

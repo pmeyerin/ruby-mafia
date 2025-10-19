@@ -17,5 +17,11 @@ Ready players
 <% end %>
 
 <% if @game.player.count >= @game.min_players %>
-  <%= link_to "Start game", game_path(@game, :game_phase => 1), data: {turbo_method: :patch} %>
+  <%= form_with model: @current_round do |form| %>
+    <%= form.hidden_field :game_id, value: @game.id %>
+    <%= form.hidden_field :round_number, value: 1 %>
+    <%= form.hidden_field :game_phase, value: GAME_PHASE[:NIGHT] %>
+    <%= form.submit "Start game" %>
+  <% end %>
+  <%#= link_to "Start game", game_path(@game, :game_phase => 1), data: {turbo_method: :patch} %>
 <% end %>

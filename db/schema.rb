@@ -10,17 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_16_154340) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_16_211111) do
   create_table "games", force: :cascade do |t|
     t.string "name"
     t.integer "min_players"
     t.integer "max_players"
     t.boolean "use_detective"
     t.boolean "use_doctor"
-    t.integer "game_phase"
     t.float "mafioso_ratio"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "player_actions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "player_id"
+    t.integer "round_id"
+    t.integer "target_id"
+    t.index ["player_id"], name: "index_player_actions_on_player_id"
+    t.index ["round_id"], name: "index_player_actions_on_round_id"
+    t.index ["target_id"], name: "index_player_actions_on_target_id"
   end
 
   create_table "players", force: :cascade do |t|
@@ -29,14 +39,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_16_154340) do
     t.string "display_name"
     t.integer "game_id"
     t.integer "user_id"
-    t.integer "action_target_id"
-    t.integer "prev_action_target_id"
     t.integer "role"
     t.boolean "alive"
-    t.index ["action_target_id"], name: "index_players_on_action_target_id"
     t.index ["game_id"], name: "index_players_on_game_id"
-    t.index ["prev_action_target_id"], name: "index_players_on_prev_action_target_id"
     t.index ["user_id"], name: "index_players_on_user_id"
+  end
+
+  create_table "rounds", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "game_id"
+    t.integer "game_phase"
+    t.integer "round_number"
+    t.integer "mafiosi_vote_fail_count"
+    t.index ["game_id"], name: "index_rounds_on_game_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -56,7 +72,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_16_154340) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
-  add_foreign_key "players", "players", column: "action_target_id"
-  add_foreign_key "players", "players", column: "prev_action_target_id"
   add_foreign_key "sessions", "users"
 end

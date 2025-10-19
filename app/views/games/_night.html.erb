@@ -51,14 +51,20 @@
 
     <% @non_mafiosi.filter { |player| player.alive == true }.each do |villager| %>
       <li>
-        <% if villager.id != @player.action_target_id %>
-          <%= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
+        <% if villager.id != @player_action.target_id %>
+          <%= form_with model: @player_action, id: "player_actions#{villager.id}" do |form| %>
+            <%= form.hidden_field :player_id, value: @player.id %>
+            <%= form.hidden_field :round_id, value: @current_round.id %>
+            <%= form.hidden_field :target_id, value: villager.id %>
+            <%= form.submit  villager.display_name %>
+            <% PlayerAction.where(round_id: @current_round.id, target_id: villager.id, player_id: @mafiosi.select("id")).where.not(player_id: @player.id).select("player_id").each do |mafioso| %>
+              (target of <%= @mafiosi.filter { |voter| voter.id == mafioso.player_id }.first.display_name %>)
+            <% end %>
+          <% end %>
         <% else %>
           <%= villager.display_name %> (Your current target)
-        <% end %>
-        <% @mafiosi.filter { |player| player.alive == true }.each do |mafioso| %>
-          <% if villager.id == mafioso.action_target_id and mafioso.id != @player.id %>
-            (target of <%= mafioso.display_name %>)
+          <% PlayerAction.where(round_id: @current_round.id, target_id: villager.id, player_id: @mafiosi.select("id")).where.not(player_id: @player.id).select("player_id").each do |mafioso| %>
+            (target of <%= @mafiosi.filter { |voter| voter.id == mafioso.player_id }.first.display_name %>)
           <% end %>
         <% end %>
       </li>
@@ -85,13 +91,18 @@
   <ul>
     <% @game.player.filter { |player| player.alive == true }.each do |villager| %>
       <% if villager.id != @player.id %>
-        <% if villager.id != @player.action_target_id %>
-          <li>
-            <%= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
-          </li>
-        <% else %>
-          <%= villager.display_name %> (Your current target)
-        <% end %>
+        <li>
+          <% if villager.id != @player_action.target_id %>
+              <%= form_with model: @player_action, id: "player_actions#{villager.id}" do |form| %>
+                <%= form.hidden_field :player_id, value: @player.id %>
+                <%= form.hidden_field :round_id, value: @current_round.id %>
+                <%= form.hidden_field :target_id, value: villager.id %>
+                <%= form.submit  villager.display_name %>
+              <% end %>
+          <% else %>
+            <%= villager.display_name %> (Your current target)
+          <% end %>
+        </li>
       <% end %>
     <% end %>
   </ul>
@@ -116,10 +127,20 @@
   <ul>
     <% @game.player.filter { |player| player.alive == true }.each do |villager| %>
       <% if villager.id != @player.id %>
-        <% if villager.id != @player.action_target_id %>
+        <% if @player_action == nil or villager.id != @player_action.target_id %>
           <li>
-            <%= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
+            <%= form_with model: @player_action, id: "player_actions#{villager.id}" do |form| %>
+              <%= form.hidden_field :player_id, value: @player.id %>
+              <%= form.hidden_field :round_id, value: @current_round.id %>
+              <%= form.hidden_field :target_id, value: villager.id %>
+              <%= form.submit  villager.display_name %>
+            <% end %>
+            <%#= form.submit %>
+            <%#= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
           </li>
+<!--          <li>-->
+            <%#= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
+<!--          </li>-->
         <% else %>
           <%= villager.display_name %> (Your current target)
         <% end %>

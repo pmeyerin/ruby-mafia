@@ -2,10 +2,10 @@
   <%= render "game_over", game: @game %>
 <% elsif @player and !@player.alive%>
   <%= render "dead_player" %>
+<% elsif @current_round.round_number > 0 %>
+  <%= render "night", game: @game, player: @player if (@current_round.game_phase == GAME_PHASE[:NIGHT]) %>
+
+  <%= render "day", game: @game, player: @player if (@current_round.game_phase == GAME_PHASE[:DAY]) %>
 <% else %>
-  <%= render "pending_start", game: @game if (@game.game_phase == GAME_PHASE[:PENDING_START]) %>
-
-  <%= render "night", game: @game, player: @player if (@game.game_phase == GAME_PHASE[:NIGHT]) %>
-
-  <%= render "day", game: @game, player: @player if (@game.game_phase == GAME_PHASE[:DAY]) %>
+  <%= render "pending_start", game: @game %>
 <% end %>

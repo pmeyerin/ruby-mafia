@@ -18,7 +18,7 @@ Rails.application.routes.draw do
 
   patch "/games/:id", to: "games#update_phase"
   patch "/players/:id", to: "players#patch_player"
-  resources :games, :players
+  resources :games, :players, :rounds, :player_actions
 
   root "games#index"
 end

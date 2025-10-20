@@ -1,7 +1,6 @@
 require "test_helper"
 
 class PlayerActionControllerTest < ActionDispatch::IntegrationTest
-
   setup do
     sign_in users(:one)
   end
@@ -31,7 +30,7 @@ class PlayerActionControllerTest < ActionDispatch::IntegrationTest
     this_game = games(:one)
     acting_round = Round.create(game_id: this_game.id, game_phase: 1, round_number: 1)
     action = PlayerAction.create(target_id: players(:three).id, player_id: players(:one).id, round_id: acting_round.id)
-    put player_action_path(action), params: { player_action: { target_id: players(:two), player_id: players(:one).id, round_id: acting_round.id } }
+    put player_action_path(action), params: { player_action: { target_id: players(:two).id, player_id: players(:one).id, round_id: acting_round.id } }
 
     assert_equal players(:two).id, PlayerAction.last.target_id
     assert_response :redirect

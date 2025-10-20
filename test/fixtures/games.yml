@@ -1,0 +1,8 @@
+one:
+  id: 1
+  name: "test_game"
+  min_players: 5
+  max_players: 20
+  use_doctor: true
+  use_detective: true
+  mafioso_ratio: 3

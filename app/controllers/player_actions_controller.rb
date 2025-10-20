@@ -61,7 +61,7 @@ class PlayerActionsController < ApplicationController
         doctor_target = PlayerAction.where(round_id: current_round.id,
                                            player_id: Player.where(game_id: game.id, role: PLAYER_ROLE[:DOCTOR], alive: true))
                                     .select("target_id").first
-        if doctor_target != chosen_target.id
+        if doctor_target == nil or doctor_target.target_id != chosen_target.id
           chosen_target.update(alive: false)
         end
       end
@@ -89,10 +89,15 @@ class PlayerActionsController < ApplicationController
       end
     end
 
+    at_least_half = Array.new
     tallied_votes.each do |player, votes|
       if votes >= game.player.filter { |lifeCheck| lifeCheck.alive == true }.count / 2
-        return player
+        at_least_half << player
       end
+    end
+
+    if at_least_half.count == 1
+      return at_least_half[0]
     end
 
     nil

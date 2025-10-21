@@ -1,10 +1,16 @@
 class GamesController < ApplicationController
+  allow_unauthenticated_access only: %i[index show]
   def index
-    @logged_in_user = Current.user.id
-    @avail_games = Game.where.not(id: Game.joins(:round).select("games.id"))
-                       .where.not(id: Player.where(user_id: @logged_in_user).select("game_id"))
-    @my_games = Game.where(id: Player.where(user_id: @logged_in_user).select("game_id"))
-    @player = Player.new
+    if authenticated?
+      @logged_in_user = Current.user.id
+      @my_games = Game.where(id: Player.where(user_id: @logged_in_user).select("game_id"))
+      @avail_games = Game.where.not(id: Game.joins(:round).select("games.id"))
+                         .where.not(id: Player.where(user_id: @logged_in_user).select("game_id"))
+      @player = Player.new
+    else
+      @avail_games = Game.where.not(id: Game.joins(:round).select("games.id"))
+      @my_games = []
+    end
   end
 
   def new
@@ -22,7 +28,9 @@ class GamesController < ApplicationController
 
   def show
     @game = Game.find(params[:id])
-    @player = Player.where(user_id: Current.user.id, game_id: @game.id).first
+    if authenticated?
+      @player = Player.where(user_id: Current.user.id, game_id: @game.id).first
+    end
     if Round.where(game_id: @game.id).count > 0
       @current_round = Round.where(game_id: @game.id, round_number: Round.where(game_id: @game.id).maximum(:round_number)).first
       @player_action = PlayerAction.where(round_id: @current_round.id, player_id: @player.id).first

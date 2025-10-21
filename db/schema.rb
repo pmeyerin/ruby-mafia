@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_16_211111) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_20_204049) do
   create_table "games", force: :cascade do |t|
     t.string "name"
     t.integer "min_players"
@@ -51,7 +51,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_16_211111) do
     t.integer "game_id"
     t.integer "game_phase"
     t.integer "round_number"
-    t.integer "mafiosi_vote_fail_count"
     t.index ["game_id"], name: "index_rounds_on_game_id"
   end
 
@@ -65,10 +64,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_16_211111) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email_address", null: false
+    t.string "email_address"
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "user_name", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 

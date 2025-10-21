@@ -1,5 +1,6 @@
 class PlayerActionsController < ApplicationController
   def create
+    puts params
     @player_action = PlayerAction.new(player_action_params)
     this_game = Game.find(Round.where(id: params[:player_action][:round_id]).select("game_id"))
     if @player_action.save

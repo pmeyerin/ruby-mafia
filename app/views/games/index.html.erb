@@ -1,23 +1,33 @@
+<a href="https://www.wikihow.com/Play-Mafia" target="_blank">How to play</a>
+
 <h2>Available games</h2>
 
-<%= link_to "New game", new_game_path %>
+<%= link_to "New game", new_game_path if authenticated? %>
 
 <div id="avail_games">
+  <% if @avail_games.count == 0 %>
+    <p>No available games</p>
+  <% end %>
   <% @avail_games.each do |game| %>
     <div>
       <%= link_to game.name, game %>
 
-      <%= link_to "Join game", new_player_path(:game_id => game.id) %>
+      <%= link_to "Join game", new_player_path(:game_id => game.id) if authenticated? %>
     </div>
   <% end %>
 </div>
 
-<hr/>
-<h2>My games</h2>
-<div id="my_games">
-  <% @my_games.each do |game| %>
-    <div>
-      <%= link_to game.name, game %>
-    </div>
-  <% end %>
-</div>
+<% if authenticated? %>
+  <hr/>
+  <h2>My games</h2>
+  <div id="my_games">
+    <% if @my_games.count == 0 %>
+      <p>Not currently in any games</p>
+    <% end %>
+    <% @my_games.each do |game| %>
+      <div>
+        <%= link_to game.name, game %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

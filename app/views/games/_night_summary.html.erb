@@ -1,7 +1,11 @@
 <% if @mafiosi_target == nil %>
   <p>The mafiosi failed to decide on a target. No one was attacked.</p>
 <% elsif @doctor_saved %>
-  <p><%= @mafiosi_target.display_name %> was attacked during the night but the doctor arrived in time to save them.</p>
+  <% if @mafiosi_target.id == @player.id %>
+    <p>You were attacked during the night but the doctor arrived in time to save you. You could not identify your attackers or the doctor.</p>
+  <% else %>
+    <p>Someone was attacked during the night but the doctor arrived in time to save them. That player knows they were attacked, but could not identify their attackers or the doctor.</p>
+  <% end %>
 <% else %>
   <p><%= @mafiosi_target.display_name %> was attacked and eliminated during the night. This player was a <%= Player::ROLES[@mafiosi_target.role] %></p>
 <% end %>

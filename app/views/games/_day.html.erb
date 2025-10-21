@@ -67,13 +67,19 @@
   <% @game.player.filter { |player| player.alive == true }.each do |villager| %>
     <% if villager.id != @player.id %>
       <li>
-        <% if villager.id != @player.action_target_id %>
-          <%= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
+        <% if villager.id != @player_action.target_id %>
+          <%= form_with model: @player_action, id: "player_actions#{villager.id}" do |form| %>
+            <%= form.hidden_field :player_id, value: @player.id %>
+            <%= form.hidden_field :round_id, value: @current_round.id %>
+            <%= form.hidden_field :target_id, value: villager.id %>
+            <%= form.submit  villager.display_name %>
+            <% PlayerAction.where(round_id: @current_round.id, target_id: villager.id).where.not(player_id: @player.id).select("player_id").each do |mafioso| %>
+              (target of <%= mafioso.player.display_name %>)
+            <% end %>
+          <% end %>
         <% else %>
           <%= villager.display_name %> (Your current target)
-        <% end %>
-        <% game.player.each do |voter| %>
-          <% if villager.id == voter.action_target_id and voter.id != @player.id %>
+          <% Player.where(id: @current_round.player_actions.where(target_id: villager.id).where.not(player_id: @player.id).select("player_id")).each do |voter| %>
             (target of <%= voter.display_name %>)
           <% end %>
         <% end %>

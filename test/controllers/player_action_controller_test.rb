@@ -72,6 +72,25 @@ class PlayerActionControllerTest < ActionDispatch::IntegrationTest
     assert_equal true, Player.find(players(:four).id).alive
   end
 
+  test "odd number not a tie" do
+    players(:six).update(alive: false)
+
+    this_game = games(:one)
+    acting_round = Round.create(game_id: this_game.id, game_phase: GAME_PHASE[:DAY], round_number: 1)
+    PlayerAction.create(target_id: players(:three).id, player_id: players(:one).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:four).id, player_id: players(:two).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:four).id, player_id: players(:three).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:four).id, player_id: players(:four).id, round_id: acting_round.id)
+    post player_actions_path, params: { player_action: { target_id: players(:three).id, player_id: players(:five).id, round_id: acting_round.id } }
+    assert_response :redirect
+    assert_redirected_to game_path(this_game)
+    assert_equal players(:three).id, PlayerAction.last.target_id
+    assert_equal 2, Round.last.round_number
+    assert_equal GAME_PHASE[:NIGHT], Round.last.game_phase
+    assert_equal true, Player.find(players(:three).id).alive
+    assert_equal false, Player.find(players(:four).id).alive
+  end
+
   test "doctor saves victim" do
     this_game = games(:one)
     acting_round = Round.create(game_id: this_game.id, game_phase: GAME_PHASE[:NIGHT], round_number: 1)

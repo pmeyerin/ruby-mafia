@@ -28,7 +28,6 @@ class RoundsController < ApplicationController
     end
 
     if game.use_doctor
-      puts "DOCTOR? #{PLAYER_ROLE[:DOCTOR]}"
       player_indices[index] = PLAYER_ROLE[:DOCTOR]
       index = index + 1
     end

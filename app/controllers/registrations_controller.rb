@@ -5,7 +5,6 @@ class RegistrationsController < ApplicationController
   end
 
   def create
-    puts params
     @user = User.new(user_params)
     if @user.save
       start_new_session_for @user

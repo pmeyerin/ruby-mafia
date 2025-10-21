@@ -1,6 +1,5 @@
 class PlayerActionsController < ApplicationController
   def create
-    puts params
     @player_action = PlayerAction.new(player_action_params)
     this_game = Game.find(Round.where(id: params[:player_action][:round_id]).select("game_id"))
     if @player_action.save
@@ -92,7 +91,7 @@ class PlayerActionsController < ApplicationController
 
     at_least_half = Array.new
     tallied_votes.each do |player, votes|
-      if votes >= game.player.filter { |lifeCheck| lifeCheck.alive == true }.count / 2
+      if votes >= game.player.filter { |lifeCheck| lifeCheck.alive == true }.count / 2.0
         at_least_half << player
       end
     end

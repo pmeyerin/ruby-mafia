@@ -11,7 +11,7 @@ Attempting to make the party game "Mafia" in Ruby-on-Rails
 * Track what happened each round
 * Clean up games some time after they have ended
 * ~~Display username for logged-in user~~
-* New user registration
+* ~~New user registration~~
 * Am I using variables correctly in the controllers?
 * ~~Handle tie on daytime votes~~
     * ~~Currently if two villagers get exactly 50% of the votes one will be chosen arbitrarily by the server~~

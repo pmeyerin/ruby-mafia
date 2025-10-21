@@ -75,8 +75,6 @@ class PlayerActionControllerTest < ActionDispatch::IntegrationTest
   test "doctor saves victim" do
     this_game = games(:one)
     acting_round = Round.create(game_id: this_game.id, game_phase: GAME_PHASE[:NIGHT], round_number: 1)
-    # PlayerAction.create(target_id: players(:four).id, player_id: players(:one).id, round_id: acting_round.id)
-    # PlayerAction.create(target_id: players(:four).id, player_id: players(:two).id, round_id: acting_round.id)
     PlayerAction.create(target_id: players(:one).id, player_id: players(:three).id, round_id: acting_round.id)
     PlayerAction.create(target_id: players(:one).id, player_id: players(:four).id, round_id: acting_round.id)
     PlayerAction.create(target_id: players(:three).id, player_id: players(:five).id, round_id: acting_round.id)
@@ -91,6 +89,6 @@ class PlayerActionControllerTest < ActionDispatch::IntegrationTest
 
   private
   def sign_in(user)
-    post sessions_url, params: { email_address: user.email_address, password: "password" }
+    post sessions_url, params: { user_name: user.user_name, password: "password" }
   end
 end

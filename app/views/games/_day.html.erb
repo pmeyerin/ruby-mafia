@@ -2,12 +2,10 @@
 
 <%= render "night_summary", game: @game, player: @player %>
 
-<p>You are a <%= Player::ROLES[@player.role] %></p>
+<p>You are <span class="player-name"><%= @player.display_name %></span>, a <%= Player::ROLES[@player.role] %></p>
 
 <% if @player.role == PLAYER_ROLE[:VILLAGER] %>
   <p>Your goal as a villager is to eliminate all of the mafiosi.</p>
-
-  <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
 <% end %>
 
 <% if @player.role == PLAYER_ROLE[:MAFIOSO] %>
@@ -18,11 +16,9 @@
   <p>Because you are undercover you have a vote in whom to eliminate as though you were a normal villager. You must convince the others you are not a mafioso.</p>
 
   <p>This game's mafiosi are:</p>
-  <ul>
-    <% @mafiosi.each do |mafioso| %>
-      <li><%= mafioso.display_name %></li>
-    <% end %>
-  </ul>
+  <%= render "noninteractive_player_list", player_list: @mafiosi %>
+<% else %>
+  <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
 <% end %>
 
 <% if @player.role == PLAYER_ROLE[:DETECTIVE] %>
@@ -32,11 +28,7 @@
 
   <% if @detective_saw %>
     <p>During the night you witnessed the attacked on <%= @mafiosi_target.display_name %>! You identified the mafiosi as:</p>
-    <ul>
-      <% @mafiosi.each do |mafioso| %>
-        <li><%= mafioso.display_name %></li>
-      <% end %>
-    </ul>
+    <%= render "noninteractive_player_list", player_list: @mafiosi %>
   <% end %>
 <% end %>
 
@@ -46,8 +38,6 @@
   <p>Your goal as a doctor is to eliminate all of the mafiosi.</p>
 
   <p>During the night you have may choose a villager to visit. If that villager is attacked you will prevent that villager from dying.</p>
-
-  <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
 <% end %>
 
 <p>When someone has more than 50 percent of the votes that person will be eliminated and the game will transition to night time</p>
@@ -63,27 +53,9 @@
   </ul>
 <% end %>
 
-<ul>
-  <% @game.player.filter { |player| player.alive == true }.each do |villager| %>
-    <% if villager.id != @player.id %>
-      <li>
-        <% if villager.id != @player_action.target_id %>
-          <%= form_with model: @player_action, id: "player_actions#{villager.id}" do |form| %>
-            <%= form.hidden_field :player_id, value: @player.id %>
-            <%= form.hidden_field :round_id, value: @current_round.id %>
-            <%= form.hidden_field :target_id, value: villager.id %>
-            <%= form.submit  villager.display_name %>
-            <% PlayerAction.where(round_id: @current_round.id, target_id: villager.id).where.not(player_id: @player.id).select("player_id").each do |mafioso| %>
-              (target of <%= mafioso.player.display_name %>)
-            <% end %>
-          <% end %>
-        <% else %>
-          <%= villager.display_name %> (Your current target)
-          <% Player.where(id: @current_round.player_actions.where(target_id: villager.id).where.not(player_id: @player.id).select("player_id")).each do |voter| %>
-            (target of <%= voter.display_name %>)
-          <% end %>
-        <% end %>
-      </li>
-    <% end %>
-  <% end %>
-</ul>
+<%= render "interactive_player_list",
+           player_list: @game.player.filter { |player| player.alive == true },
+           current_player_action: @player_action,
+           current_round: @current_round,
+           current_player: @player,
+           show_target_of: "ALL" %>

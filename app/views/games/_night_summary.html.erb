@@ -7,5 +7,5 @@
     <p>Someone was attacked during the night but the doctor arrived in time to save them. That player knows they were attacked, but could not identify their attackers or the doctor.</p>
   <% end %>
 <% else %>
-  <p><%= @mafiosi_target.display_name %> was attacked and eliminated during the night. This player was a <%= Player::ROLES[@mafiosi_target.role] %></p>
+  <p><span class="player-name"><%= @mafiosi_target.display_name %></span> was attacked and eliminated during the night. This player was a <%= Player::ROLES[@mafiosi_target.role] %></p>
 <% end %>

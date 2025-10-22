@@ -1,150 +1,56 @@
 <h3>NIGHT TIME</h3>
 
-<p>You are <%= @player.display_name %>, a <%= Player::ROLES[@player.role] %></p>
+<p>You are <span class="player-name"><%= @player.display_name %></span>, a <%= Player::ROLES[@player.role] %></p>
 
 <% if @eliminated_player %>
-  <p>The villagers voted to eliminated <%= @eliminated_player.display_name %>. This player was a <%= Player::ROLES[@eliminated_player.role] %></p>
+  <p>The villagers voted to eliminated <span class="player-name"><%= @eliminated_player.display_name %></span>. This player was a <%= Player::ROLES[@eliminated_player.role] %></p>
 <% end %>
 
 <% if @player.role == PLAYER_ROLE[:VILLAGER] %>
   <p>Your goal as a villager is to eliminate all of the mafiosi.</p>
 
   <p>During the night you have no actions to take. Day will begin when the following nighttime actions have completed:</p>
-
-  <ul>
-    <li>Overnight the Mafiosi are planning which villager to attack.</li>
-    <% if @game.use_detective %>
-      <li>The detective will visit one of the villagers overnight. If they visit the villager that is attacked the detective will learn the identity of the killers.</li>
-    <% end %>
-    <% if @game.use_doctor %>
-      <li>The doctor will visit one of the villagers overnight. If they visit the villager that is attacked that villager will survive the attack.</li>
-    <% end %>
-  </ul>
 <% end %>
 
 <% if @player.role == PLAYER_ROLE[:MAFIOSO] %>
   <p>Your goal as a mafioso is to eliminate all of the villagers. You will win if the number of villagers equals the number of mafiosi.</p>
 
   <p>This game's mafiosi are:</p>
-  <ul>
-    <% @mafiosi.each do |mafioso| %>
-      <li><%= mafioso.display_name %></li>
-    <% end %>
-  </ul>
+  <%= render "noninteractive_player_list", player_list: @mafiosi %>
 
-  <p>During the night you and the other mafiosi will choose a villager to attack. If you fail to reach a unanimous decision with the other mafiosi on whom to attack your decisions when the last night action has been chosen no one will be attacked.</p>
-
-  <p>Day will begin when the following nighttime actions have completed:</p>
-
-  <ul>
-    <li>You and the other mafiosi must choose a villager to attack</li>
-    <% if @game.use_detective %>
-      <li>The detective will visit one of the villagers overnight. If they visit the villager that is attacked the detective will learn the identity of the killers.</li>
-    <% end %>
-    <% if @game.use_doctor %>
-      <li>The doctor will visit one of the villagers overnight. If they visit the villager that is attacked that villager will survive the attack.</li>
-    <% end %>
-  </ul>
-
-  <p>Choose your target</p>
-  <ul>
-
-    <% @non_mafiosi.filter { |player| player.alive == true }.each do |villager| %>
-      <li>
-        <% if villager.id != @player_action.target_id %>
-          <%= form_with model: @player_action, id: "player_actions#{villager.id}" do |form| %>
-            <%= form.hidden_field :player_id, value: @player.id %>
-            <%= form.hidden_field :round_id, value: @current_round.id %>
-            <%= form.hidden_field :target_id, value: villager.id %>
-            <%= form.submit  villager.display_name %>
-            <% PlayerAction.where(round_id: @current_round.id, target_id: villager.id, player_id: @mafiosi.select("id")).where.not(player_id: @player.id).select("player_id").each do |mafioso| %>
-              (target of <%= @mafiosi.filter { |voter| voter.id == mafioso.player_id }.first.display_name %>)
-            <% end %>
-          <% end %>
-        <% else %>
-          <%= villager.display_name %> (Your current target)
-          <% PlayerAction.where(round_id: @current_round.id, target_id: villager.id, player_id: @mafiosi.select("id")).where.not(player_id: @player.id).select("player_id").each do |mafioso| %>
-            (target of <%= @mafiosi.filter { |voter| voter.id == mafioso.player_id }.first.display_name %>)
-          <% end %>
-        <% end %>
-      </li>
-    <% end %>
-  </ul>
+  <p>During the night you and the other mafiosi will choose a villager to attack. This decision must be unanimous. If it is not unanimous no one will be attacked.</p>
 <% end %>
 
 <% if @player.role == PLAYER_ROLE[:DETECTIVE] %>
   <p>Your goal as a detective is to eliminate all of the mafiosi.</p>
 
-  <p>During the night you have may choose a villager to visit. If that villager is attacked you will learn the identity of the Mafiosi.</p>
-
-  <p>Day will begin when the following nighttime actions have completed:</p>
-
-  <ul>
-    <li>Overnight the Mafiosi are planning which villager to attack.</li>
-    <% if @game.use_doctor %>
-      <li>The doctor will visit one of the villagers overnight. If they visit the villager that is attacked that villager will survive the attack.</li>
-    <% end %>
-  </ul>
-
-  <p>Choose a player to visit:</p>
-
-  <ul>
-    <% @game.player.filter { |player| player.alive == true }.each do |villager| %>
-      <% if villager.id != @player.id %>
-        <li>
-          <% if villager.id != @player_action.target_id %>
-              <%= form_with model: @player_action, id: "player_actions#{villager.id}" do |form| %>
-                <%= form.hidden_field :player_id, value: @player.id %>
-                <%= form.hidden_field :round_id, value: @current_round.id %>
-                <%= form.hidden_field :target_id, value: villager.id %>
-                <%= form.submit  villager.display_name %>
-              <% end %>
-          <% else %>
-            <%= villager.display_name %> (Your current target)
-          <% end %>
-        </li>
-      <% end %>
-    <% end %>
-  </ul>
+  <p>During the night you have must choose a villager to visit. If that villager is attacked you will learn the identity of the Mafiosi.</p>
 <% end %>
 
 <% if @player.role == PLAYER_ROLE[:DOCTOR] %>
   <p>Your goal as a doctor is to eliminate all of the mafiosi.</p>
 
-  <p>During the night you have may choose a villager to visit. If that villager is attacked you will prevent that villager from dying.</p>
+  <p>During the night you have must choose a villager to visit. If that villager is attacked you will prevent that villager from dying.</p>
+<% end %>
 
-  <p>Day will begin when the following nighttime actions have completed:</p>
+<%= render "night_actions_explainer", use_detective: @game.use_detective, use_doctor: @game.use_doctor %>
 
-  <ul>
-    <li>Overnight the Mafiosi are planning which villager to attack.</li>
-    <% if @game.use_detective %>
-      <li>The detective will visit one of the villagers overnight. If they visit the villager that is attacked the detective will learn the identity of the killers.</li>
-    <% end %>
-  </ul>
-
+<% if @player.role == PLAYER_ROLE[:MAFIOSO] %>
+  <p>Choose your target</p>
+  <%= render "interactive_player_list",
+             player_list: @non_mafiosi,
+             current_player_action: @player_action,
+             current_round: @current_round,
+             current_player: @player,
+             show_target_of: "ROLE",
+             show_target_of_role: [PLAYER_ROLE[:MAFIOSO]] %>
+<% elsif @player.role == PLAYER_ROLE[:DETECTIVE] or @player.role == PLAYER_ROLE[:DOCTOR] %>
   <p>Choose a player to visit:</p>
-
-  <ul>
-    <% @game.player.filter { |player| player.alive == true }.each do |villager| %>
-      <% if villager.id != @player.id %>
-        <% if @player_action == nil or villager.id != @player_action.target_id %>
-          <li>
-            <%= form_with model: @player_action, id: "player_actions#{villager.id}" do |form| %>
-              <%= form.hidden_field :player_id, value: @player.id %>
-              <%= form.hidden_field :round_id, value: @current_round.id %>
-              <%= form.hidden_field :target_id, value: villager.id %>
-              <%= form.submit  villager.display_name %>
-            <% end %>
-            <%#= form.submit %>
-            <%#= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
-          </li>
-<!--          <li>-->
-            <%#= link_to villager.display_name, player_path(@player, :action_target => villager.id, :game_redirect => @game.id), data: {turbo_method: :patch} %>
-<!--          </li>-->
-        <% else %>
-          <%= villager.display_name %> (Your current target)
-        <% end %>
-      <% end %>
-    <% end %>
-  </ul>
+  <%= render "interactive_player_list",
+             ignore_current_player: true,
+             player_list: @game.player.filter { |player| player.alive == true },
+             current_player_action: @player_action,
+             current_round: @current_round,
+             current_player: @player,
+             show_target_of: "NONE" %>
 <% end %>

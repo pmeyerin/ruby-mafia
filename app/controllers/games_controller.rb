@@ -34,7 +34,7 @@ class GamesController < ApplicationController
     if Round.where(game_id: @game.id).count > 0
       @current_round = Round.where(game_id: @game.id, round_number: Round.where(game_id: @game.id).maximum(:round_number)).first
       @player_action = PlayerAction.where(round_id: @current_round.id, player_id: @player.id).first
-      if !@player_action
+      unless @player_action
         @player_action = PlayerAction.new
       end
       @non_mafiosi = Player.where(game_id: @game.id, alive: true).where.not(role: PLAYER_ROLE[:MAFIOSO])

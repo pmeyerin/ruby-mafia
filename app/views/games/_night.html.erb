@@ -24,7 +24,22 @@
 <% if @player.role == PLAYER_ROLE[:DETECTIVE] %>
   <p>Your goal as a detective is to eliminate all of the mafiosi.</p>
 
-  <p>During the night you have must choose a villager to visit. If that villager is attacked you will learn the identity of the Mafiosi.</p>
+  <p>During the night you have may choose a villager to visit. If that villager is a Mafioso they will be eliminated. <% if @game.remaining_detective_investigations > 0 %>You may do this <b><%= @game.remaining_detective_investigations %></b> more times. <% end %></p>
+
+  <% if @game.remaining_detective_investigations > 0 %>
+    <% if @player_action and @player_action.target_id == @player.id %>
+      <p>You have chosen not to do an investigation tonight. You can change your mind by choosing someone to visit below.</p>
+    <% else %>
+      <%= form_with model: @player_action, id: "player_actions#{@player.id}" do |form| %>
+        <%= form.hidden_field :player_id, value: @player.id %>
+        <%= form.hidden_field :round_id, value: @current_round.id %>
+        <%= form.hidden_field :target_id, value: @player.id %>
+        <%= form.submit  "Investigate no one tonight" %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p>You have used all your investigations for this game.</p>
+  <% end %>
 <% end %>
 
 <% if @player.role == PLAYER_ROLE[:DOCTOR] %>
@@ -44,7 +59,7 @@
              current_player: @player,
              show_target_of: "ROLE",
              show_target_of_role: [PLAYER_ROLE[:MAFIOSO]] %>
-<% elsif @player.role == PLAYER_ROLE[:DETECTIVE] or @player.role == PLAYER_ROLE[:DOCTOR] %>
+<% elsif (@player.role == PLAYER_ROLE[:DETECTIVE] and @game.remaining_detective_investigations > 0) or @player.role == PLAYER_ROLE[:DOCTOR] %>
   <p>Choose a player to visit:</p>
   <%= render "interactive_player_list",
              ignore_current_player: true,

@@ -55,10 +55,9 @@ class GamesController < ApplicationController
                              player_id: Player.where(game_id: @game.id, role: PLAYER_ROLE[:DOCTOR]).first.id)
                       .select("player_id").count > 0
 
-          @detective_saw = PlayerAction.where(round_id: previous_round.id,
-                             target_id: @mafiosi_target.id,
-                             player_id: Player.where(game_id: @game.id, role: PLAYER_ROLE[:DETECTIVE]).first.id)
-                      .select("player_id").count > 0
+          @detective_saw = PlayerAction.where(player_id: Player.where(game_id: @game.id, role: PLAYER_ROLE[:DETECTIVE]),
+                                              target_id: Player.where(game_id: @game.id, role: PLAYER_ROLE[:MAFIOSO]),
+                                              round_id: previous_round.id).first
         end
       else
         @eliminated_player = find_previous_chosen_player(@game, @current_round)

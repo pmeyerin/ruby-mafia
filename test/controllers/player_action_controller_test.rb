@@ -106,6 +106,56 @@ class PlayerActionControllerTest < ActionDispatch::IntegrationTest
     assert_equal true, Player.find(players(:one).id).alive
   end
 
+  test "detective guesses incorrectly" do
+    this_game = games(:one)
+    acting_round = Round.create(game_id: this_game.id, game_phase: GAME_PHASE[:NIGHT], round_number: 1)
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:three).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:four).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:six).id, player_id: players(:five).id, round_id: acting_round.id)
+    assert_difference "Game.find(1).remaining_detective_investigations", -1 do
+      post player_actions_path, params: { player_action: { target_id: players(:five).id, player_id: players(:six).id, round_id: acting_round.id } }
+    end
+    assert_not Player.find(players(:one).id).alive
+    assert Player.find(players(:six).id).alive
+  end
+
+  test "detective makes no guess" do
+    this_game = games(:one)
+    acting_round = Round.create(game_id: this_game.id, game_phase: GAME_PHASE[:NIGHT], round_number: 1)
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:three).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:four).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:five).id, player_id: players(:five).id, round_id: acting_round.id)
+    assert_difference "Game.find(1).remaining_detective_investigations", 0 do
+      post player_actions_path, params: { player_action: { target_id: players(:five).id, player_id: players(:six).id, round_id: acting_round.id } }
+    end
+    assert_not Player.find(players(:one).id).alive
+    assert Player.find(players(:five).id).alive
+  end
+
+  test "detective guesses correctly" do
+    this_game = games(:one)
+    acting_round = Round.create(game_id: this_game.id, game_phase: GAME_PHASE[:NIGHT], round_number: 1)
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:three).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:four).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:three).id, player_id: players(:five).id, round_id: acting_round.id)
+    assert_difference "Game.find(1).remaining_detective_investigations", -1 do
+      post player_actions_path, params: { player_action: { target_id: players(:five).id, player_id: players(:six).id, round_id: acting_round.id } }
+    end
+    assert_not Player.find(players(:one).id).alive
+    assert_not Player.find(players(:three).id).alive
+  end
+
+  test "round ends without detective action because no investigations left" do
+    this_game = games(:one)
+    this_game.update(remaining_detective_investigations: 0)
+    acting_round = Round.create(game_id: this_game.id, game_phase: GAME_PHASE[:NIGHT], round_number: 1)
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:three).id, round_id: acting_round.id)
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:four).id, round_id: acting_round.id)
+    assert_difference "Round.count", 1 do
+      post player_actions_path, params: { player_action: { target_id: players(:five).id, player_id: players(:six).id, round_id: acting_round.id } }
+    end
+  end
+
   private
   def sign_in(user)
     post sessions_url, params: { user_name: user.user_name, password: "password" }

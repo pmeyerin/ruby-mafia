@@ -6,3 +6,4 @@ one:
   use_doctor: true
   use_detective: true
   mafioso_ratio: 3
+  remaining_detective_investigations: 2

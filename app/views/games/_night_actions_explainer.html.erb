@@ -1,0 +1,11 @@
+<%# locals: (use_detective: , use_doctor:) -%>
+
+<ul>
+  <li>Overnight the Mafiosi are planning which villager to attack.</li>
+  <% if use_detective %>
+    <li>The detective will visit one of the villagers overnight to investigate. If the villager they investigate is a Mafioso that player will be eliminated.</li>
+  <% end %>
+  <% if use_doctor %>
+    <li>The doctor will visit one of the villagers overnight. If they visit the villager that is attacked that villager will survive the attack.</li>
+  <% end %>
+</ul>

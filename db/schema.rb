@@ -10,63 +10,64 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_20_204049) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_22_212709) do
   create_table "games", force: :cascade do |t|
-    t.string "name"
-    t.integer "min_players"
+    t.datetime "created_at", null: false
+    t.float "mafioso_ratio"
     t.integer "max_players"
+    t.integer "min_players"
+    t.string "name"
+    t.integer "remaining_detective_investigations"
+    t.datetime "updated_at", null: false
     t.boolean "use_detective"
     t.boolean "use_doctor"
-    t.float "mafioso_ratio"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "player_actions", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "player_id"
     t.integer "round_id"
     t.integer "target_id"
+    t.datetime "updated_at", null: false
     t.index ["player_id"], name: "index_player_actions_on_player_id"
     t.index ["round_id"], name: "index_player_actions_on_round_id"
     t.index ["target_id"], name: "index_player_actions_on_target_id"
   end
 
   create_table "players", force: :cascade do |t|
+    t.boolean "alive"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "display_name"
     t.integer "game_id"
-    t.integer "user_id"
     t.integer "role"
-    t.boolean "alive"
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["game_id"], name: "index_players_on_game_id"
     t.index ["user_id"], name: "index_players_on_user_id"
   end
 
   create_table "rounds", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "game_id"
     t.integer "game_phase"
     t.integer "round_number"
+    t.datetime "updated_at", null: false
     t.index ["game_id"], name: "index_rounds_on_game_id"
   end
 
   create_table "sessions", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.string "ip_address"
-    t.string "user_agent"
     t.datetime "created_at", null: false
+    t.string "ip_address"
     t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.string "email_address"
     t.string "password_digest", null: false
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "user_name", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true

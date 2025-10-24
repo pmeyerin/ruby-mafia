@@ -1,0 +1,6 @@
+<%# locals: (player_list:) -%>
+<ul>
+  <% player_list.each do |mafioso| %>
+    <li><span class="player-name"><%= mafioso.display_name %></span></li>
+  <% end %>
+</ul>

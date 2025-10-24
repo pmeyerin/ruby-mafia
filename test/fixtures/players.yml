@@ -9,7 +9,7 @@ one:
   display_name: "one"
   game_id: 1
   user_id: 1
-  role: 0
+  role: 0 #villager
   alive: true
 
 two:
@@ -17,7 +17,7 @@ two:
   display_name: "two"
   game_id: 1
   user_id: 2
-  role: 0
+  role: 0 #villager
   alive: true
 
 three:
@@ -25,7 +25,7 @@ three:
   display_name: "three"
   game_id: 1
   user_id: 3
-  role: 1
+  role: 1 #mafioso
   alive: true
 
 four:
@@ -33,7 +33,7 @@ four:
   display_name: "four"
   game_id: 1
   user_id: 4
-  role: 1
+  role: 1 #mafioso
   alive: true
 
 five:
@@ -41,7 +41,7 @@ five:
   display_name: "five"
   game_id: 1
   user_id: 5
-  role: 2
+  role: 2 #detective
   alive: true
 
 six:
@@ -49,5 +49,5 @@ six:
   display_name: "six"
   game_id: 1
   user_id: 6
-  role: 3
+  role: 3 #doctor
   alive: true

@@ -1,0 +1,29 @@
+<%# locals: (ignore_current_player: true, player_list:, current_player_action:, current_round:, current_player:, show_target_of: "ALL", show_target_of_role:[]) -%>
+<ul class="interactive-unordered-list">
+  <% player_list.filter { |player| !ignore_current_player or player.id != current_player.id }.each do |this_player| %>
+    <li>
+      <% if this_player.id != current_player_action.target_id %>
+        <%= form_with model: current_player_action, id: "player_actions#{this_player.id}" do |form| %>
+          <%= form.hidden_field :player_id, value: current_player.id %>
+          <%= form.hidden_field :round_id, value: current_round.id %>
+          <%= form.hidden_field :target_id, value: this_player.id %>
+          <%= form.submit  this_player.display_name %>
+          <% current_round.player_actions
+                .filter { |action| action.target_id == this_player.id and action.player_id != current_player.id }
+                .filter { |action| show_target_of == "ALL" or (show_target_of == "ROLE" and show_target_of_role.include? action.player.role) }
+                .each do  |player_action | %>
+            (target of <span class="player-name"><%= player_action.player.display_name %></span>)
+          <% end %>
+        <% end %>
+      <% else %>
+        <span class="player-name"><%= this_player.display_name %></span> (Your current target)
+        <% current_round.player_actions
+                        .filter { |action| action.target_id == this_player.id and action.player_id != current_player.id }
+                        .filter { |action| show_target_of == "ALL" or (show_target_of == "ROLE" and show_target_of_role.include? action.player.role) }
+                        .each do  |player_action | %>
+          (target of <span class="player-name"><%= player_action.player.display_name %></span>)
+        <% end %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

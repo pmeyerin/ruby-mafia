@@ -24,6 +24,7 @@ class RoundsController < ApplicationController
 
     if game.use_detective
       player_indices[index] = PLAYER_ROLE[:DETECTIVE]
+      game.update(remaining_detective_investigations: qty_mafioso)
       index = index + 1
     end
 

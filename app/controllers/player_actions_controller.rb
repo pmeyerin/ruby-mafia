@@ -35,6 +35,9 @@ class PlayerActionsController < ApplicationController
     expected_action_count = game.player.filter { |player| player.alive == true }.count
     if current_round.game_phase == GAME_PHASE[:NIGHT]
       expected_action_count = game.player.filter { |player| player.alive == true and player.role != PLAYER_ROLE[:VILLAGER] }.count
+      if game.remaining_detective_investigations <= 0
+        expected_action_count = expected_action_count - 1
+      end
     end
     PlayerAction.where(round_id: current_round.id).count == expected_action_count
   end
@@ -63,6 +66,14 @@ class PlayerActionsController < ApplicationController
                                     .select("target_id").first
         if doctor_target == nil or doctor_target.target_id != chosen_target.id
           chosen_target.update(alive: false)
+        end
+      end
+      detective_target = PlayerAction.where(round_id: current_round.id,
+                                         player_id: Player.where(game_id: game.id, role: PLAYER_ROLE[:DETECTIVE], alive: true)).first
+      if detective_target and detective_target.target_id != detective_target.player_id and game.remaining_detective_investigations > 0
+        game.update(remaining_detective_investigations: game.remaining_detective_investigations - 1)
+        if detective_target.target.role == PLAYER_ROLE[:MAFIOSO]
+          detective_target.target.update(alive: false)
         end
       end
     end

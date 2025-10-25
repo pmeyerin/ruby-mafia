@@ -1,39 +1,40 @@
+<%# locals: (current_round:, logged_in_player:, game:, previous_round:) -%>
 <h3>NIGHT TIME</h3>
 
-<p>You are <span class="player-name"><%= @player.display_name %></span>, a <%= Player::ROLES[@player.role] %></p>
+<p>You are <span class="player-name"><%= logged_in_player.display_name %></span>, a <%= Player::ROLES[logged_in_player.role] %></p>
 
-<% if @eliminated_player %>
-  <p>The villagers voted to eliminated <span class="player-name"><%= @eliminated_player.display_name %></span>. This player was a <%= Player::ROLES[@eliminated_player.role] %></p>
+<% if (eliminated_player = RoundService.find_eliminated_player(previous_round)) %>
+  <p>The villagers voted to eliminated <span class="player-name"><%= eliminated_player.display_name %></span>. This player was a <%= Player::ROLES[eliminated_player.role] %></p>
 <% end %>
 
-<% if @player.role == PLAYER_ROLE[:VILLAGER] %>
+<% if logged_in_player.role == PLAYER_ROLE[:VILLAGER] %>
   <p>Your goal as a villager is to eliminate all of the mafiosi.</p>
 
   <p>During the night you have no actions to take. Day will begin when the following nighttime actions have completed:</p>
 <% end %>
 
-<% if @player.role == PLAYER_ROLE[:MAFIOSO] %>
+<% if logged_in_player.role == PLAYER_ROLE[:MAFIOSO] %>
   <p>Your goal as a mafioso is to eliminate all of the villagers. You will win if the number of villagers equals the number of mafiosi.</p>
 
   <p>This game's mafiosi are:</p>
-  <%= render "noninteractive_player_list", player_list: @mafiosi %>
+  <%= render "noninteractive_player_list", player_list: GameService.find_all_mafiosi(game) %>
 
   <p>During the night you and the other mafiosi will choose a villager to attack. This decision must be unanimous. If it is not unanimous no one will be attacked.</p>
 <% end %>
 
-<% if @player.role == PLAYER_ROLE[:DETECTIVE] %>
+<% if logged_in_player.role == PLAYER_ROLE[:DETECTIVE] %>
   <p>Your goal as a detective is to eliminate all of the mafiosi.</p>
 
-  <p>During the night you have may choose a villager to visit. If that villager is a Mafioso they will be eliminated. <% if @game.remaining_detective_investigations > 0 %>You may do this <b><%= @game.remaining_detective_investigations %></b> more times. <% end %></p>
+  <p>During the night you have may choose a villager to visit. If that villager is a Mafioso they will be eliminated. <% if game.remaining_detective_investigations > 0 %>You may do this <b><%= @game.remaining_detective_investigations %></b> more times. <% end %></p>
 
-  <% if @game.remaining_detective_investigations > 0 %>
-    <% if @player_action and @player_action.target_id == @player.id %>
+  <% if game and game.remaining_detective_investigations > 0 %>
+    <% if (player_action = RoundService.find_action_for_player(current_round, logged_in_player)) and player_action.target_id == logged_in_player.id %>
       <p>You have chosen not to do an investigation tonight. You can change your mind by choosing someone to visit below.</p>
     <% else %>
-      <%= form_with model: @player_action, id: "player_actions#{@player.id}" do |form| %>
-        <%= form.hidden_field :player_id, value: @player.id %>
-        <%= form.hidden_field :round_id, value: @current_round.id %>
-        <%= form.hidden_field :target_id, value: @player.id %>
+      <%= form_with model: @player_action, id: "player_actions#{logged_in_player.id}" do |form| %>
+        <%= form.hidden_field :player_id, value: logged_in_player.id %>
+        <%= form.hidden_field :round_id, value: current_round.id %>
+        <%= form.hidden_field :target_id, value: logged_in_player.id %>
         <%= form.submit  "Investigate no one tonight" %>
       <% end %>
     <% end %>
@@ -42,30 +43,32 @@
   <% end %>
 <% end %>
 
-<% if @player.role == PLAYER_ROLE[:DOCTOR] %>
+<% if logged_in_player.role == PLAYER_ROLE[:DOCTOR] %>
   <p>Your goal as a doctor is to eliminate all of the mafiosi.</p>
 
   <p>During the night you have must choose a villager to visit. If that villager is attacked you will prevent that villager from dying.</p>
 <% end %>
 
-<%= render "night_actions_explainer", use_detective: @game.use_detective, use_doctor: @game.use_doctor %>
+<%= render "night_actions_explainer", use_detective: game.use_detective, use_doctor: game.use_doctor %>
 
-<% if @player.role == PLAYER_ROLE[:MAFIOSO] %>
+<% if logged_in_player.role == PLAYER_ROLE[:MAFIOSO] %>
   <p>Choose your target</p>
   <%= render "interactive_player_list",
-             player_list: @non_mafiosi,
+             player_list: GameService.find_living_non_mafiosi(game),
              current_player_action: @player_action,
-             current_round: @current_round,
-             current_player: @player,
+             current_round: current_round,
+             current_player: logged_in_player,
              show_target_of: "ROLE",
              show_target_of_role: [PLAYER_ROLE[:MAFIOSO]] %>
-<% elsif (@player.role == PLAYER_ROLE[:DETECTIVE] and @game.remaining_detective_investigations > 0) or @player.role == PLAYER_ROLE[:DOCTOR] %>
+<% elsif (logged_in_player.role == PLAYER_ROLE[:DETECTIVE] and game.remaining_detective_investigations > 0) or logged_in_player.role == PLAYER_ROLE[:DOCTOR] %>
   <p>Choose a player to visit:</p>
   <%= render "interactive_player_list",
              ignore_current_player: true,
-             player_list: @game.player.filter { |player| player.alive == true },
+             player_list: game.player.filter { |player| player.alive == true },
              current_player_action: @player_action,
-             current_round: @current_round,
-             current_player: @player,
+             current_round: current_round,
+             current_player: logged_in_player,
              show_target_of: "NONE" %>
 <% end %>
+
+<%= render "round_history", game: game, current_round: current_round unless current_round.round_number <= 1 %>

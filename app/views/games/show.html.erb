@@ -1,11 +1,18 @@
-<% if @game_over %>
+<% if GameService.declare_winner(@game) %>
   <%= render "game_over", game: @game %>
 <% elsif @player and !@player.alive%>
-  <%= render "dead_player" %>
-<% elsif @current_round.round_number > 0 %>
-  <%= render "night", game: @game, player: @player if (@current_round.game_phase == GAME_PHASE[:NIGHT]) %>
+  <%= render "dead_player", player: @player %>
+<% elsif (current_round = RoundService.get_current_round(@game)) and current_round.round_number > 0 %>
+  <%= render "night", game: @game,
+             logged_in_player: @player,
+             current_round: RoundService.get_current_round(@game),
+             previous_round: RoundService.get_previous_round(@game) if (current_round.game_phase == GAME_PHASE[:NIGHT]) %>
 
-  <%= render "day", game: @game, player: @player if (@current_round.game_phase == GAME_PHASE[:DAY]) %>
+  <%= render "day", game: @game,
+             logged_in_player: @player,
+             current_round: RoundService.get_current_round(@game),
+             previous_round: RoundService.get_previous_round(@game) if (current_round.game_phase == GAME_PHASE[:DAY]) %>
 <% else %>
-  <%= render "pending_start", game: @game %>
+  <%= render "pending_start", game: @game,
+             current_round: RoundService.get_current_round(@game) %>
 <% end %>

@@ -1,14 +1,18 @@
+<%# locals: (current_round:, logged_in_player:, game:, previous_round:) -%>
 <h3>DAY TIME</h3>
 
-<%= render "night_summary", game: @game, player: @player %>
+<%= render "night_summary", logged_in_player: logged_in_player,
+           mafia_target: RoundService.find_mafia_target(previous_round),
+           detective_found: RoundService.detective_found(previous_round),
+           doctor_saved: RoundService.doctor_saved(previous_round)%>
 
-<p>You are <span class="player-name"><%= @player.display_name %></span>, a <%= Player::ROLES[@player.role] %></p>
+<p>You are <span class="player-name"><%= logged_in_player.display_name %></span>, a <%= Player::ROLES[logged_in_player.role] %></p>
 
-<% if @player.role == PLAYER_ROLE[:VILLAGER] %>
+<% if logged_in_player.role == PLAYER_ROLE[:VILLAGER] %>
   <p>Your goal as a villager is to eliminate all of the mafiosi.</p>
 <% end %>
 
-<% if @player.role == PLAYER_ROLE[:MAFIOSO] %>
+<% if logged_in_player.role == PLAYER_ROLE[:MAFIOSO] %>
   <p>Your goal as a mafioso is to eliminate all of the villagers. You will win if the number of villagers equals the number of mafiosi.</p>
 
   <p>During the night you and the other mafiosi will choose a villager to attack.</p>
@@ -16,25 +20,20 @@
   <p>Because you are undercover you have a vote in whom to eliminate as though you were a normal villager. You must convince the others you are not a mafioso.</p>
 
   <p>This game's mafiosi are:</p>
-  <%= render "noninteractive_player_list", player_list: @mafiosi %>
+  <%= render "noninteractive_player_list", player_list: GameService.find_all_mafiosi(game) %>
 <% else %>
   <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
 <% end %>
 
-<% if @player.role == PLAYER_ROLE[:DETECTIVE] %>
+<% if logged_in_player.role == PLAYER_ROLE[:DETECTIVE] %>
   <p>Your goal as a detective is to eliminate all of the mafiosi.</p>
 
   <p>During the night you have may choose a villager to visit. If that villager is attacked you will learn the identity of the Mafiosi.</p>
-
-  <% if @detective_saw %>
-    <p>During the night you witnessed the attacked on <%= @mafiosi_target.display_name %>! You identified the mafiosi as:</p>
-    <%= render "noninteractive_player_list", player_list: @mafiosi %>
-  <% end %>
 <% end %>
 
 <p>During the day the villagers vote on one person to eliminate. You should cast your vote for someone you believe is secretly a mafioso.</p>
 
-<% if @player.role == PLAYER_ROLE[:DOCTOR] %>
+<% if logged_in_player.role == PLAYER_ROLE[:DOCTOR] %>
   <p>Your goal as a doctor is to eliminate all of the mafiosi.</p>
 
   <p>During the night you have may choose a villager to visit. If that villager is attacked you will prevent that villager from dying.</p>
@@ -44,18 +43,20 @@
 
 <p>Choose someone to vote to eliminate:</p>
 
-<% if @voting_for_me.count > 0 %>
+<% if (targeting_me = RoundService.targeting_this_player(current_round, logged_in_player)) and targeting_me.count > 0 %>
   <p>The following players have voted to eliminate you:</p>
   <ul>
-    <% @voting_for_me.each do |voter| %>
+    <% targeting_me.each do |voter| %>
       <li><%= voter.display_name %></li>
     <% end %>
   </ul>
 <% end %>
 
 <%= render "interactive_player_list",
-           player_list: @game.player.filter { |player| player.alive == true },
+           player_list: game.player.filter { |player| player.alive == true },
            current_player_action: @player_action,
-           current_round: @current_round,
-           current_player: @player,
+           current_round: current_round,
+           current_player: logged_in_player,
            show_target_of: "ALL" %>
+
+<%= render "round_history", game: game, current_round: current_round unless current_round.round_number <= 1 %>

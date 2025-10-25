@@ -1,15 +1,16 @@
-<% if @mafiosi_target == nil %>
+<%# locals: (mafia_target:, doctor_saved:, logged_in_player:, detective_found:) -%>
+<% if mafia_target == nil %>
   <p>The mafiosi failed to decide on a target. No one was attacked.</p>
-<% elsif @doctor_saved %>
-  <% if @mafiosi_target.id == @player.id %>
-    <p>You were attacked during the night but the doctor arrived in time to save you. You could not identify your attackers or the doctor.</p>
+<% elsif doctor_saved %>
+  <% if mafia_target.id == logged_in_player.id %>
+    <p><b>You</b> were attacked during the night but the doctor arrived in time to save you. You could not identify your attackers or the doctor.</p>
   <% else %>
     <p>Someone was attacked during the night but the doctor arrived in time to save them. That player knows they were attacked, but could not identify their attackers or the doctor.</p>
   <% end %>
 <% else %>
-  <p><span class="player-name"><%= @mafiosi_target.display_name %></span> was attacked and eliminated during the night. This player was a <%= Player::ROLES[@mafiosi_target.role] %></p>
+  <p><span class="player-name"><%= mafia_target.display_name %></span> was attacked and eliminated during the night. This player was a <%= Player::ROLES[mafia_target.role] %></p>
 <% end %>
 
-<% if @detective_saw %>
-  <p>The detective identified <span class="player-name"><%= @detective_saw.target.display_name %></span> as a Mafioso and took them into custody.</p>
+<% if detective_found %>
+  <p>The detective identified <span class="player-name"><%= detective_found.display_name %></span> as a Mafioso and took them into custody.</p>
 <% end %>

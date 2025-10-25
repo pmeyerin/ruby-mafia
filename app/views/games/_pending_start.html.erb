@@ -1,24 +1,25 @@
+<%# locals: (game:, current_round:) -%>
 <h3>this game is waiting to start</h3>
 
 Ready players
-<%= @game.player.count %> out of min <%= @game.min_players %> and expected max of <%= @game.max_players %>
+<%= game.player.count %> out of min <%= game.min_players %> and expected max of <%= game.max_players %>
 
 <ul>
-  <% @game.player.each do |player| %>
+  <% game.player.each do |player| %>
     <li><%= player.display_name %></li>
   <% end %>
 </ul>
 
-<% if @game.use_detective %>
+<% if game.use_detective %>
   This game will include a detective <br/>
 <% end %>
-<% if @game.use_doctor %>
+<% if game.use_doctor %>
   This game will include a doctor <br/>
 <% end %>
 
-<% if @game.player.count >= @game.min_players and authenticated? %>
-  <%= form_with model: @current_round do |form| %>
-    <%= form.hidden_field :game_id, value: @game.id %>
+<% if game.player.count >= game.min_players and authenticated? %>
+  <%= form_with model: Round.new do |form| %>
+    <%= form.hidden_field :game_id, value: game.id %>
     <%= form.hidden_field :round_number, value: 1 %>
     <%= form.hidden_field :game_phase, value: GAME_PHASE[:NIGHT] %>
     <%= form.submit "Start game" %>

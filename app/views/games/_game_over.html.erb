@@ -1,6 +1,7 @@
+<%# locals: (game:) -%>
 <h1>Game over!</h1>
 
-<% if @mafiosi.count == 0 %>
+<% if GameService.declare_winner(game) == FACTIONS[:VILLAGERS] %>
   <h2>The villagers won!</h2>
 <% else %>
   <h2>The mafiosi won!</h2>
@@ -12,3 +13,5 @@
     <li><%= player.display_name %> (<%= Player::ROLES[player.role] %>) <%= player.alive ? "survived" : "did not survive" %></li>
   <% end %>
 </ul>
+
+<%= render "round_history_content_uncensored", game: game, current_round: game.round.last %>

@@ -1,0 +1,25 @@
+<%# locals: (game:, current_round:) -%>
+
+<button type="button" class="collapsible">Show round history</button>
+<div class="content">
+  <%= render "round_history_content", game: game, current_round: current_round %>
+</div>
+
+<script language="JavaScript">
+  function setup_collapsible() {
+      let coll = document.getElementsByClassName("collapsible");
+
+      for (const element of coll) {
+          element.addEventListener("click", function() {
+              this.classList.toggle("active");
+              let content = this.nextElementSibling;
+              if (content.style.display === "block") {
+                  content.style.display = "none";
+              } else {
+                  content.style.display = "block";
+              }
+          });
+      }
+  }
+  setup_collapsible()
+</script>

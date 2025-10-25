@@ -1,5 +1,10 @@
 class GamesController < ApplicationController
   allow_unauthenticated_access only: %i[index show]
+
+  # def initialize
+  #   @round_service = RoundService.new
+  #   @game_service = GameService.new
+  # end
   def index
     if authenticated?
       @logged_in_user = Current.user.id
@@ -28,42 +33,16 @@ class GamesController < ApplicationController
 
   def show
     @game = Game.find(params[:id])
+    current_round = RoundService.get_current_round(@game)
+    @player_action = PlayerAction.new
     if authenticated?
       @player = Player.where(user_id: Current.user.id, game_id: @game.id).first
-    end
-    if Round.where(game_id: @game.id).count > 0
-      @current_round = Round.where(game_id: @game.id, round_number: Round.where(game_id: @game.id).maximum(:round_number)).first
-      @player_action = PlayerAction.where(round_id: @current_round.id, player_id: @player.id).first
-      unless @player_action
-        @player_action = PlayerAction.new
-      end
-      @non_mafiosi = Player.where(game_id: @game.id, alive: true).where.not(role: PLAYER_ROLE[:MAFIOSO])
-      @mafiosi = Player.where(game_id: @game.id, role: PLAYER_ROLE[:MAFIOSO], alive: true)
-      @game_over = false
-      if (@mafiosi.count == 0) or (@non_mafiosi.count == @mafiosi.count)
-        @game_over = true
-      end
-      if @current_round.game_phase == GAME_PHASE[:DAY]
-        previous_round = Round.where(game_id: @game.id, round_number: @current_round.round_number - 1).first
-        @voting_for_me = Player.where(id: PlayerAction.where(round_id: @current_round.id,
-                                                             target_id: @player.id).select("player_id"))
-
-        @mafiosi_target = find_mafiosi_target(previous_round)
-        if @mafiosi_target
-          @doctor_saved = PlayerAction.where(round_id: previous_round.id,
-                             target_id: @mafiosi_target.id,
-                             player_id: Player.where(game_id: @game.id, role: PLAYER_ROLE[:DOCTOR]).first.id)
-                      .select("player_id").count > 0
-
-          @detective_saw = PlayerAction.where(player_id: Player.where(game_id: @game.id, role: PLAYER_ROLE[:DETECTIVE]),
-                                              target_id: Player.where(game_id: @game.id, role: PLAYER_ROLE[:MAFIOSO]),
-                                              round_id: previous_round.id).first
+      if current_round
+        @player_action = PlayerAction.where(round_id: current_round.id, player_id: @player.id).first
+        unless @player_action
+          @player_action = PlayerAction.new
         end
-      else
-        @eliminated_player = find_previous_chosen_player(@game, @current_round)
       end
-    else
-      @current_round = Round.new(game_id: @game.id, round_number: 0, game_phase: GAME_PHASE[:NIGHT])
     end
   end
 

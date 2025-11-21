@@ -1,6 +1,10 @@
 class MurderMethodFactory
   def self.pick_murder_method(round)
     seed = round.flavor_text_seed
+    puts "-----------"
+    puts seed
+    puts StringService.hash_string(seed)
+    puts "-----------"
     MurderMethod.subclasses[StringService.hash_string(seed) % MurderMethod.subclasses.length].new
   end
   def self.find_murder_method(method_name)

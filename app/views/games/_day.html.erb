@@ -4,7 +4,8 @@
 <%= render "night_summary", logged_in_player: logged_in_player,
            mafia_target: RoundService.find_mafia_target(previous_round),
            detective_found: RoundService.detective_found(previous_round),
-           doctor_saved: RoundService.doctor_saved(previous_round)%>
+           doctor_saved: RoundService.doctor_saved(previous_round),
+           previous_round: previous_round %>
 
 <p>You are <span class="player-name"><%= logged_in_player.display_name %></span>, a <%= Player::ROLES[logged_in_player.role] %></p>
 

@@ -30,10 +30,30 @@ class RoundService
   end
 
   def self.detective_found(round)
-    singular_target_by_role(round, PLAYER_ROLE[:DETECTIVE])
+    detective_target = singular_target_by_role(round, PLAYER_ROLE[:DETECTIVE])
+    if detective_target.role == PLAYER_ROLE[:MAFIOSO]
+      detective_target
+    end
   end
 
   def self.find_eliminated_player(round)
+    if round.game_phase == GAME_PHASE[:DAY]
+      tallied_votes = find_vote_tallies(round)
+
+      at_least_half = Array.new
+      tallied_votes.each do |player, votes|
+        if votes >= round.player_actions.count / 2.0
+          at_least_half << player
+        end
+      end
+
+      if at_least_half.count == 1
+        at_least_half[0]
+      end
+    end
+  end
+
+  def self.find_vote_tallies(round)
     if round.game_phase == GAME_PHASE[:DAY]
       raw_votes = round.player_actions
       tallied_votes = {}
@@ -47,16 +67,7 @@ class RoundService
         end
       end
 
-      at_least_half = Array.new
-      tallied_votes.each do |player, votes|
-        if votes >= raw_votes.count / 2.0
-          at_least_half << player
-        end
-      end
-
-      if at_least_half.count == 1
-        at_least_half[0]
-      end
+      tallied_votes
     end
   end
 
@@ -86,5 +97,21 @@ class RoundService
     if actions.count == 1
       actions[0]
     end
+  end
+
+  def self.generate_mafia_hit_flavor_text(round)
+    murder_method = MurderMethodFactory.pick_murder_method(round)
+    location = MurderLocationFactory.pick_murder_location(murder_method, round)
+    if location
+      location.description(round.round_number)
+    end
+  end
+
+  def self.generate_detective_discovery_flavor_text(round)
+    DetectiveUncoverFactory.pick_uncovery_type(round).description(detective_found(round))
+  end
+
+  def self.generate_voting_flavor_text(round)
+    VotingDescriptionFactory.pick_voting_description(round).description(round)
   end
 end

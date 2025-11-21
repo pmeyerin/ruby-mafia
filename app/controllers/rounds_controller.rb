@@ -4,9 +4,9 @@ class RoundsController < ApplicationController
     current_round = Round.where(game_id: @game.id, round_number: Round.where(game_id: @game.id).maximum(:round_number)).first
     if current_round == nil
       assign_player_roles(@game)
-      Round.create(game_id: @game.id, round_number: 1, game_phase: GAME_PHASE[:NIGHT])
+      Round.create(game_id: @game.id, round_number: 1, game_phase: GAME_PHASE[:NIGHT], flavor_text_seed: SecureRandom.uuid)
     else
-      Round.create(game_id: @game.id, round_number: current_round.round_number + 1, game_phase: params[:game_phase])
+      Round.create(game_id: @game.id, round_number: current_round.round_number + 1, game_phase: params[:game_phase], flavor_text_seed: SecureRandom.uuid)
     end
     redirect_to game_path(@game)
   end

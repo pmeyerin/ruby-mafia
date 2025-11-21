@@ -5,7 +5,7 @@ class MurderLocationFactoryTest < ActiveSupport::TestCase
     this_game = games(:one)
     this_round = Round.create(game_id: this_game.id, game_phase: GAME_PHASE[:NIGHT], round_number: 1, flavor_text_seed: "blah")
     result = MurderLocationFactory.pick_murder_location(MachineGunAmbush.new, this_round)
-    assert_equal TollBooth, result.class # if new murder locations are added this will have to change
+    assert_equal VillageSquare, result.class # if new murder locations are added this will have to change
   end
   test "find specific method" do
     result = MurderLocationFactory.find_murder_location("TollBooth")

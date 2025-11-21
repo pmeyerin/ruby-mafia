@@ -1,13 +1,6 @@
 class MurderMethodFactory
   def self.pick_murder_method(round)
     seed = round.flavor_text_seed
-    puts "-----------"
-    puts seed
-    puts StringService.hash_string(seed)
-    puts MurderMethod.subclasses.length
-    puts MurderMethod.subclasses.sort_by { |clazz| clazz.name }.join(", ")
-    puts "#{(12619 % 3)}"
-    puts "-----------"
     MurderMethod.subclasses.sort_by { |clazz| clazz.name }[StringService.hash_string(seed) % MurderMethod.subclasses.length].new
   end
   def self.find_murder_method(method_name)

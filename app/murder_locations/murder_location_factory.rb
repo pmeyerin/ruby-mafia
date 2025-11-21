@@ -8,7 +8,7 @@ class MurderLocationFactory
       MatchService.contains_all_required_tags(location.tags, murder_method.required_location_tags) and
       MatchService.contains_no_barred_tags(location.tags, murder_method.barred_location_tags) }
 
-    chosen_loc = possible_locations[StringService.hash_string(seed) % possible_locations.length]
+    chosen_loc = possible_locations.sort_by { |clazz| clazz.name }[StringService.hash_string(seed) % possible_locations.length]
 
     slots = {}
     chosen_loc.slot_types.each do  |slot_type|

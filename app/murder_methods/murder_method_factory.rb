@@ -5,6 +5,8 @@ class MurderMethodFactory
     puts seed
     puts StringService.hash_string(seed)
     puts MurderMethod.subclasses.length
+    puts MurderMethod.subclasses.sort_by { |clazz| clazz.name }.join(", ")
+    puts "#{(12619 % 3)}"
     puts "-----------"
     MurderMethod.subclasses.sort_by { |clazz| clazz.name }[StringService.hash_string(seed) % MurderMethod.subclasses.length].new
   end

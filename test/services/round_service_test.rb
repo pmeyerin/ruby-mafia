@@ -166,4 +166,21 @@ class RoundServiceTest < ActiveSupport::TestCase
     result = RoundService.find_action_for_player(this_round, players(:six))
     assert_nil result
   end
+  test "detective target IDed" do
+    this_round = Round.create(game_id: games(:one).id, round_number: 1, game_phase: GAME_PHASE[:DAY])
+    PlayerAction.create(target_id: players(:three).id, player_id: players(:five).id, round_id: this_round.id)
+    result = RoundService.detective_found(this_round)
+    assert_equal players(:three).id, result.id
+    assert_equal PLAYER_ROLE[:MAFIOSO], result.role
+  end
+  test "Detective did not find mafioso" do
+    this_round = Round.create(game_id: games(:one).id, round_number: 1, game_phase: GAME_PHASE[:DAY])
+    PlayerAction.create(target_id: players(:one).id, player_id: players(:five).id, round_id: this_round.id)
+    assert_nil RoundService.detective_found(this_round)
+  end
+  test "detective investigated no one this round" do
+    this_round = Round.create(game_id: games(:one).id, round_number: 1, game_phase: GAME_PHASE[:DAY])
+    PlayerAction.create(target_id: players(:five).id, player_id: players(:five).id, round_id: this_round.id)
+    assert_nil RoundService.detective_found(this_round)
+  end
 end

@@ -4,6 +4,7 @@ class MurderMethodFactory
     puts "-----------"
     puts seed
     puts StringService.hash_string(seed)
+    puts MurderMethod.subclasses.length
     puts "-----------"
     MurderMethod.subclasses[StringService.hash_string(seed) % MurderMethod.subclasses.length].new
   end

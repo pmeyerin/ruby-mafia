@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_10_22_212709) do
+ActiveRecord::Schema[8.1].define(version: 2025_10_28_173249) do
   create_table "games", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.float "mafioso_ratio"
@@ -48,6 +48,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_10_22_212709) do
 
   create_table "rounds", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "flavor_text_seed"
     t.integer "game_id"
     t.integer "game_phase"
     t.integer "round_number"

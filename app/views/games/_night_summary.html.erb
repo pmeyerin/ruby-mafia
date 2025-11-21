@@ -1,4 +1,4 @@
-<%# locals: (mafia_target:, doctor_saved:, logged_in_player:, detective_found:) -%>
+<%# locals: (mafia_target:, doctor_saved:, logged_in_player:, detective_found:, previous_round:) -%>
 <% if mafia_target == nil %>
   <p>The mafiosi failed to decide on a target. No one was attacked.</p>
 <% elsif doctor_saved %>
@@ -8,9 +8,17 @@
     <p>Someone was attacked during the night but the doctor arrived in time to save them. That player knows they were attacked, but could not identify their attackers or the doctor.</p>
   <% end %>
 <% else %>
-  <p><span class="player-name"><%= mafia_target.display_name %></span> was attacked and eliminated during the night. This player was a <%= Player::ROLES[mafia_target.role] %></p>
+  <% if (flavor_text = RoundService.generate_mafia_hit_flavor_text(previous_round)) %>
+    <%= tag.p flavor_text.html_safe %>
+    <p><span class="player-name"><%= mafia_target.display_name %></span> was revealed to be a <%= Player::ROLES[mafia_target.role] %></p>
+  <% else %>
+      <p><span class="player-name"><%= mafia_target.display_name %></span> was attacked and eliminated during the night. This player was a <%= Player::ROLES[mafia_target.role] %></p>
+  <% end %>
+  <p>
+    <%=  %>
+  </p>
 <% end %>
 
 <% if detective_found %>
-  <p>The detective identified <span class="player-name"><%= detective_found.display_name %></span> as a Mafioso and took them into custody.</p>
+  <%= tag.p RoundService.generate_detective_discovery_flavor_text(previous_round).html_safe %>
 <% end %>

@@ -3,8 +3,9 @@
 
 <p>You are <span class="player-name"><%= logged_in_player.display_name %></span>, a <%= Player::ROLES[logged_in_player.role] %></p>
 
-<% if (eliminated_player = RoundService.find_eliminated_player(previous_round)) %>
-  <p>The villagers voted to eliminated <span class="player-name"><%= eliminated_player.display_name %></span>. This player was a <%= Player::ROLES[eliminated_player.role] %></p>
+<% if current_round.round_number > 1 and (eliminated_player = RoundService.find_eliminated_player(previous_round)) %>
+  <%= tag.p RoundService.generate_voting_flavor_text(previous_round).html_safe %>
+<!--  <p>The villagers voted to eliminated <span class="player-name"><%#= eliminated_player.display_name %></span>. This player was a <%#= Player::ROLES[eliminated_player.role] %></p>-->
 <% end %>
 
 <% if logged_in_player.role == PLAYER_ROLE[:VILLAGER] %>
